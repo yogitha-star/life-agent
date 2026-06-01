@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life Agent">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Life Agent ⚡</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--surf:#1e293b;--surf2:#273449;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#f1f5f9;--muted:#94a3b8;--dim:#475569;--red:#ef4444;--redbg:rgba(239,68,68,0.13);--redb:rgba(239,68,68,0.3);--green:#22c55e;--greenbg:rgba(34,197,94,0.12);--greenb:rgba(34,197,94,0.28);--blue:#3b82f6;--bluebg:rgba(59,130,246,0.12);--blueb:rgba(59,130,246,0.28);--amber:#f59e0b;--amberbg:rgba(245,158,11,0.12);--amberb:rgba(245,158,11,0.28);--purple:#a78bfa;--purplebg:rgba(167,139,250,0.12);--purpleb:rgba(167,139,250,0.28);--r:14px;--rs:9px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+body{display:flex;flex-direction:column;max-width:500px;margin:0 auto;min-height:100vh;position:relative;}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;background:rgba(15,23,42,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:0;z-index:20;border-bottom:1px solid var(--border);}
+.app-title{font-size:17px;font-weight:600;letter-spacing:-0.4px;}
+.app-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.notif-pill{display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:20px;border:1px solid var(--border2);background:var(--surf);font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:all .2s;}
+.notif-pill.on{background:var(--greenbg);border-color:var(--greenb);color:var(--green);}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--dim);transition:background .2s;}
+.notif-pill.on .notif-dot{background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── NAV ── */
+.nav{display:flex;overflow-x:auto;padding:10px 14px;gap:7px;scrollbar-width:none;background:rgba(15,23,42,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:57px;z-index:19;border-bottom:1px solid var(--border);}
+.nav::-webkit-scrollbar{display:none;}
+.nb{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:20px;border:1px solid transparent;background:transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.nb.on{background:var(--surf2);border-color:var(--border2);color:var(--text);}
+
+/* ── CONTENT ── */
+.content{flex:1;padding:14px 14px 90px;}
+.sec{display:none;animation:fadeIn .15s ease;}
+.sec.on{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── INSTALL BANNER ── */
+.install-banner{background:linear-gradient(135deg,#1e3a5f,#0f2744);border:1px solid var(--blueb);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.install-title{font-size:16px;font-weight:600;color:#93c5fd;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.install-steps{font-size:13px;color:#7db8f7;line-height:2;}
+.install-steps b{color:#bfdbfe;}
+.btn-big{width:100%;padding:14px;border-radius:var(--rs);font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;margin-top:10px;}
+.btn-big:active{opacity:.8;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-green{background:var(--green);color:#0f172a;}
+.btn-surf{background:var(--surf2);color:var(--text);}
+
+/* ── URGENT ── */
+.urgent{background:var(--redbg);border:1px solid var(--redb);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start;}
+.urgent-ico{font-size:22px;flex-shrink:0;animation:shake 2s infinite;}
+@keyframes shake{0%,90%,100%{transform:rotate(0)}92%{transform:rotate(-8deg)}94%{transform:rotate(8deg)}96%{transform:rotate(-4deg)}98%{transform:rotate(4deg)}}
+.urgent-title{font-size:14px;font-weight:600;color:#fca5a5;margin-bottom:3px;}
+.urgent-body{font-size:12px;color:#f87171;line-height:1.5;}
+
+/* ── STATS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px;}
+.stat{background:var(--surf);border:1px solid var(--border);border-radius:var(--rs);padding:14px 10px;text-align:center;}
+.stat-val{font-size:24px;font-weight:600;font-family:'DM Mono',monospace;}
+.stat-label{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.3;}
+
+/* ── CARD ── */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px 15px;margin-bottom:12px;}
+.ctitle{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ── ROWS ── */
+.row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.row:last-child{border-bottom:none;padding-bottom:0;}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.chk.done{background:var(--green);border-color:var(--green);}
+.chk svg{display:none;}
+.chk.done svg{display:block;}
+.rtxt{flex:1;font-size:14px;color:var(--text);}
+.rtxt.done{text-decoration:line-through;color:var(--dim);}
+.remo{font-size:16px;flex-shrink:0;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.b-red{background:var(--redbg);color:#fca5a5;border:1px solid var(--redb);}
+.b-blue{background:var(--bluebg);color:#93c5fd;border:1px solid var(--blueb);}
+.b-green{background:var(--greenbg);color:#86efac;border:1px solid var(--greenb);}
+.b-amber{background:var(--amberbg);color:#fcd34d;border:1px solid var(--amberb);}
+.b-purple{background:var(--purplebg);color:#c4b5fd;border:1px solid var(--purpleb);}
+
+/* ── EVENT ROW ── */
+.ev-row{padding:12px 0;border-bottom:1px solid var(--border);}
+.ev-row:last-child{border-bottom:none;padding-bottom:0;}
+.ev-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.ev-name{font-size:14px;font-weight:500;color:var(--text);flex:1;}
+.ev-meta{font-size:12px;color:var(--muted);}
+.ev-task{font-size:12px;color:var(--amber);margin-top:4px;display:flex;align-items:center;gap:4px;}
+.ev-actions{display:flex;gap:6px;margin-top:8px;}
+.sel{flex:1;background:var(--surf2);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;appearance:none;}
+.del-btn{padding:7px 12px;background:var(--surf2);border:1px solid var(--border2);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer;}
+
+/* ── ADD FORM ── */
+.form-wrap{background:var(--surf2);border-radius:var(--rs);padding:14px;margin-top:6px;}
+.flabel{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.finput{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:11px;outline:none;}
+.finput:focus{border-color:var(--blue);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ── PROGRESS ── */
+.prog{background:var(--surf2);border-radius:20px;height:5px;overflow:hidden;margin-top:5px;}
+.prog-bar{height:100%;background:var(--green);border-radius:20px;transition:width .4s;}
+
+/* ── DSA ── */
+.dsa-topic{padding:12px 0;border-bottom:1px solid var(--border);}
+.dsa-topic:last-child{border-bottom:none;padding-bottom:0;}
+.dsa-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.dsa-name{font-size:14px;font-weight:500;color:var(--text);}
+
+/* ── SCHEDULE ── */
+.srow{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.srow:last-child{border-bottom:none;}
+.stime{font-size:12px;font-weight:600;color:var(--muted);font-family:'DM Mono',monospace;min-width:46px;padding-top:2px;}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px;}
+.sinfo .stitle{font-size:14px;font-weight:500;color:var(--text);}
+.sinfo .ssub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── TIP ── */
+.tip{background:var(--purplebg);border:1px solid var(--purpleb);border-radius:var(--rs);padding:12px 14px;font-size:13px;color:#c4b5fd;line-height:1.65;margin-bottom:8px;}
+
+/* ── NOTIF TAB ── */
+.nrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.nrow:last-child{border-bottom:none;}
+.nbubble{width:50px;height:50px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:'DM Mono',monospace;flex-shrink:0;line-height:1.2;}
+.nb7{background:var(--amberbg);color:var(--amber);border:1px solid var(--amberb);}
+.nb12{background:var(--bluebg);color:var(--blue);border:1px solid var(--blueb);}
+.nb20{background:var(--purplebg);color:var(--purple);border:1px solid var(--purpleb);}
+.ninfo .nname{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.ninfo .ndesc{font-size:12px;color:var(--muted);line-height:1.4;}
+.tog{width:44px;height:26px;border-radius:13px;background:var(--surf2);border:1px solid var(--border2);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.tog.on{background:var(--green);border-color:var(--green);}
+.tog::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.tog.on::after{transform:translateX(18px);}
+
+/* ── STREAK ── */
+.streak-row{display:flex;gap:5px;justify-content:center;margin-top:14px;}
+.dday{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
+.dday.done{background:var(--greenbg);border-color:var(--greenb);color:var(--green);}
+.dday.today{border-color:var(--blue);color:var(--blue);}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:rgba(15,23,42,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;padding:8px 8px 20px;z-index:30;}
+.bnb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s;}
+.bnb.on{color:var(--blue);}
+.bnb .bico{font-size:20px;line-height:1;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="app-title">⚡ Life Agent</div>
+    <div class="app-sub" id="topdate"></div>
+  </div>
+  <div class="notif-pill" id="npill" onclick="enableNotifs()">
+    <div class="notif-dot" id="ndot"></div>
+    <span id="nlabel">Enable alerts</span>
+  </div>
+</div>
+
+<div class="nav" id="topnav" style="display:none"><!-- hidden, bottom nav used --></div>
+
+<div class="content">
+
+  <!-- TODAY -->
+  <div id="s-today" class="sec on">
+    <div id="urgent-area"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-val" id="ov-apps">0</div><div class="stat-label">Applications</div></div>
+      <div class="stat"><div class="stat-val" id="ov-pend" style="color:var(--amber)">0</div><div class="stat-label">Pending tasks</div></div>
+      <div class="stat"><div class="stat-val" id="ov-str" style="color:var(--green)">0🔥</div><div class="stat-label">Day streak</div></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">🌿 Morning checklist</div>
+      <div id="ov-wellness"></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">💡 Confidence tip</div>
+      <div class="tip" id="daily-tip"></div>
+      <button class="btn-big btn-surf" style="padding:10px;font-size:13px;" onclick="nextTip()">↻ New tip</button>
+    </div>
+  </div>
+
+  <!-- APPLICATIONS -->
+  <div id="s-apps" class="sec">
+    <div class="card">
+      <div class="ctitle">📋 All applications & events</div>
+      <div id="ev-list"><div style="font-size:13px;color:var(--muted);">No applications yet. Add one below.</div></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">➕ Add new application</div>
+      <div class="form-wrap">
+        <div class="flabel">Event / Internship name *</div>
+        <input class="finput" id="fi-name" placeholder="e.g. Google Summer of Code">
+        <div class="flabel">Organisation</div>
+        <input class="finput" id="fi-org" placeholder="e.g. Google">
+        <div class="fgrid">
+          <div><div class="flabel">Deadline date</div><input class="finput" type="date" id="fi-date"></div>
+          <div><div class="flabel">Status</div>
+            <select class="finput" id="fi-status" style="appearance:none;">
+              <option value="pending">🟡 Pending</option>
+              <option value="applied">🔵 Applied</option>
+              <option value="upcoming">🟣 Upcoming</option>
+            </select>
+          </div>
+        </div>
+        <div class="flabel">Pending task (what you still need to do)</div>
+        <input class="finput" id="fi-task" placeholder="e.g. Submit team form by Friday">
+        <button class="btn-big btn-blue" onclick="addEvent()">+ Add to tracker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="s-sched" class="sec">
+    <div class="card"><div class="ctitle">🌅 Morning — 5:30am to 9am</div><div id="sm"></div></div>
+    <div class="card"><div class="ctitle">☀️ Day — 9am to 6pm</div><div id="sd"></div></div>
+    <div class="card"><div class="ctitle">🌙 Evening — 6pm to 10pm</div><div id="se"></div></div>
+  </div>
+
+  <!-- WELLNESS -->
+  <div id="s-well" class="sec">
+    <div class="card">
+      <div class="ctitle">🌿 Morning routine — tap to tick</div>
+      <div id="wlist"></div>
+      <div class="streak-row" id="srow"></div>
+      <div style="text-align:center;margin-top:10px;font-size:14px;font-weight:600;color:var(--green);" id="slabel">0 day streak 🔥</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">💚 Mindset notes</div>
+      <div class="tip">Your progress is not anyone else's pace. Build at your own speed. 🌱</div>
+      <div class="tip">Yoga + prayer builds a calm centre. External pressure feels lighter with it. 🙏</div>
+      <div class="tip">You are not behind. You are building. That is more than enough. ⭐</div>
+      <div class="tip">Each small win today compounds into something big in 6 months. Keep going. 🚀</div>
+    </div>
+  </div>
+
+  <!-- DSA -->
+  <div id="s-dsa" class="sec">
+    <div class="card">
+      <div class="ctitle">🐍 Python & DSA — 8 week roadmap</div>
+      <div id="dsalist"></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">📈 Study tips</div>
+      <div class="tip">1–2 LeetCode problems daily beats cramming 20 in one weekend.</div>
+      <div class="tip">After every solution, try to optimise it — O(n²) → O(n log n).</div>
+      <div class="tip">Explain your solution aloud. If you can teach it, you truly know it.</div>
+      <div class="tip">Write code by hand once a week — builds real intuition without autocomplete.</div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div id="s-alerts" class="sec">
+
+    <div id="notif-setup-card" class="install-banner">
+      <div class="install-title">🔔 Set up notifications</div>
+      <div class="install-steps">
+        Notifications pop up on your phone screen<br>
+        <b>like WhatsApp — even when screen is off</b><br><br>
+        <b>Step 1</b> — Tap the button below<br>
+        <b>Step 2</b> — Phone asks "Allow notifications?" → tap <b>Allow</b><br>
+        <b>Step 3</b> — Done! Alerts arrive automatically every day ✅
+      </div>
+      <button class="btn-big btn-green" onclick="enableNotifs()">🔔 Allow notifications now</button>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">⏰ Daily alert schedule</div>
+      <div class="nrow">
+        <div class="nbubble nb7">7:00<br><span style="font-size:10px;">AM</span></div>
+        <div class="ninfo" style="flex:1"><div class="nname">🌅 Morning wake-up</div><div class="ndesc">Open Life Agent → tick morning routine → check urgent tasks</div></div>
+        <div class="tog on" id="t7"></div>
+      </div>
+      <div class="nrow">
+        <div class="nbubble nb12">12:00<br><span style="font-size:10px;">PM</span></div>
+        <div class="ninfo" style="flex:1"><div class="nname">📨 Midday check-in</div><div class="ndesc">Check new emails → update applications → paste to AI reader</div></div>
+        <div class="tog on" id="t12"></div>
+      </div>
+      <div class="nrow">
+        <div class="nbubble nb20">8:00<br><span style="font-size:10px;">PM</span></div>
+        <div class="ninfo" style="flex:1"><div class="nname">🌙 Evening review</div><div class="ndesc">Plan tomorrow → tick DSA done → wind down by 9pm</div></div>
+        <div class="tog on" id="t20"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">🧪 Test notification</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Send a test right now to see exactly how it looks on your screen.</div>
+      <button class="btn-big btn-surf" onclick="sendTest()">Send test notification →</button>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">📲 Install as phone app</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.8;">
+        Install this on your home screen so it opens like a real app — no browser needed.<br><br>
+        <b style="color:var(--text);">Android (Chrome):</b><br>
+        Tap ⋮ menu → "Add to Home screen" → tap Add<br><br>
+        <b style="color:var(--text);">iPhone (Safari):</b><br>
+        Tap Share button → "Add to Home Screen" → tap Add
+      </div>
+      <div id="install-btn-wrap">
+        <button class="btn-big btn-blue" id="install-btn" onclick="installApp()" style="display:none;">📲 Install app now</button>
+      </div>
+      <div style="font-size:12px;color:var(--dim);margin-top:8px;">After installing, the ⚡ Life Agent icon appears on your home screen.</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bnb on" id="bn-today" onclick="goTab('today',this)"><span class="bico">🏠</span>Today</button>
+  <button class="bnb" id="bn-apps" onclick="goTab('apps',this)"><span class="bico">📋</span>Apply</button>
+  <button class="bnb" id="bn-sched" onclick="goTab('sched',this)"><span class="bico">🕐</span>Schedule</button>
+  <button class="bnb" id="bn-well" onclick="goTab('well',this)"><span class="bico">🌿</span>Morning</button>
+  <button class="bnb" id="bn-dsa" onclick="goTab('dsa',this)"><span class="bico">🐍</span>Python</button>
+  <button class="bnb" id="bn-alerts" onclick="goTab('alerts',this)"><span class="bico">🔔</span>Alerts</button>
+</div>
+
+<script>
+// ── DATA ──
+const TIPS=['Focus on your own journey. No one else has your exact mix of skills and goals.','Apply but also prepare — each application without prep is a missed learning moment.','One small improvement daily compounds into massive growth over a year.','Rejection is redirection. The right opportunity matches your readiness.','Build skills not just a resume. Skills stay with you forever.','Mental peace is your foundation. Rest is productive — protect it.','Celebrate small wins. Submitted an application? That took courage.','Compare yourself only to who you were yesterday. That is the only fair comparison.'];
+const WELL=[{id:'w1',name:'Wake up at 5:30am',e:'🌅'},{id:'w2',name:'Prayer / gratitude — 10 min',e:'🙏'},{id:'w3',name:'Yoga / stretching — 20 min',e:'🧘'},{id:'w4',name:'Cold water & hydration',e:'💧'},{id:'w5',name:'Light walk / breathing — 15 min',e:'🌿'},{id:'w6',name:"Review today's plan — 10 min",e:'📋'}];
+const DSA=[{id:'d1',t:'Python Basics',w:'Week 1–2',tasks:['Variables, data types, input/output','Loops and conditions (if/while/for)','Functions and lambda','Lists, tuples, sets, dicts']},{id:'d2',t:'Arrays & Strings',w:'Week 3',tasks:['Two pointer technique','Sliding window','String reversal & palindrome','Anagram problems']},{id:'d3',t:'Recursion & Backtracking',w:'Week 4',tasks:['Factorial, Fibonacci recursion','Permutations & combinations','Sudoku solver concept','N-Queens approach']},{id:'d4',t:'Sorting & Searching',w:'Week 5',tasks:['Merge sort, Quick sort in Python','Binary search (iterative + recursive)','Search in rotated array','Custom sort with key=']},{id:'d5',t:'Linked List & Stack/Queue',w:'Week 6',tasks:['Implement linked list in Python','Stack using list','Queue using deque','Balanced parentheses']},{id:'d6',t:'Trees & Graphs',w:'Week 7–8',tasks:['Binary tree BFS/DFS traversals','BST insert/search/delete','Graph adjacency list','Detect cycle in graph']}];
+const SCHED={m:[{t:'5:30',n:'Wake up + prayer',s:'Peaceful start — no phone yet'},{t:'5:50',n:'Yoga & breathing',s:'20 min movement'},{t:'6:20',n:'Cold water + breakfast',s:'Hydration first'},{t:'7:00',n:"Review today's plan",s:'Open Life Agent → check tasks'},{t:'7:30',n:'Morning DSA block',s:'1 problem or 1 topic'}],d:[{t:'9:00',n:'Deep work block',s:'DSA / project / event task'},{t:'11:30',n:'Applications review',s:'Check pending tasks, update status'},{t:'1:00',n:'Lunch + rest',s:'Step fully away from screens'},{t:'2:30',n:'Hackathon / event work',s:'Work on current event tasks'},{t:'5:00',n:'Check emails',s:'Paste new event emails to AI reader'}],e:[{t:'6:00',n:'Light walk / reset',s:'Clear your head'},{t:'6:30',n:'Python revision',s:"Review today's learning"},{t:'8:00',n:'Plan tomorrow',s:'Set 3 priorities for next day'},{t:'9:00',n:'Wind down',s:'No screens, read or prayer'}]};
+
+let events=[],wellDone={},dsaDone={},streak=[false,false,false,false,false,false,false],tipIdx=0,deferredPrompt=null;
+
+function save(){try{localStorage.setItem('la2_e',JSON.stringify(events));localStorage.setItem('la2_w',JSON.stringify(wellDone));localStorage.setItem('la2_d',JSON.stringify(dsaDone));localStorage.setItem('la2_s',JSON.stringify(streak));}catch(e){}}
+function load(){try{events=JSON.parse(localStorage.getItem('la2_e')||'[]');wellDone=JSON.parse(localStorage.getItem('la2_w')||'{}');dsaDone=JSON.parse(localStorage.getItem('la2_d')||'{}');streak=JSON.parse(localStorage.getItem('la2_s')||'[false,false,false,false,false,false,false]');}catch(e){}}
+
+function goTab(name,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.bnb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('s-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='today') renderToday();
+  if(name==='apps') renderApps();
+  if(name==='well') renderWell();
+  if(name==='dsa') renderDSA();
+  if(name==='sched') renderSched();
+}
+
+function renderToday(){
+  const today=new Date().toDateString();
+  document.getElementById('ov-apps').textContent=events.length;
+  document.getElementById('ov-pend').textContent=events.filter(e=>e.task&&e.status!=='completed').length;
+  document.getElementById('ov-str').textContent=streak.filter(Boolean).length+'🔥';
+  document.getElementById('daily-tip').textContent=TIPS[tipIdx%TIPS.length];
+  const urgent=events.filter(e=>{if(!e.date||e.status==='completed')return false;const d=(new Date(e.date)-new Date())/864e5;return d>=0&&d<=3;});
+  document.getElementById('urgent-area').innerHTML=urgent.map(e=>{const d=Math.ceil((new Date(e.date)-new Date())/864e5);return`<div class="urgent"><div class="urgent-ico">🚨</div><div><div class="urgent-title">${e.name} — ${d} day${d!==1?'s':''} left!</div><div class="urgent-body">${e.task||'Check tasks'} · Deadline: ${e.date}</div></div></div>`}).join('');
+  document.getElementById('ov-wellness').innerHTML=WELL.map(w=>{const done=wellDone[today+'_'+w.id];return`<div class="row" onclick="toggleW('${w.id}')"><div class="chk ${done?'done':''}"><svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="remo">${w.e}</span><span class="rtxt ${done?'done':''}">${w.name}</span></div>`}).join('');
+}
+
+function renderApps(){
+  const el=document.getElementById('ev-list');
+  if(!events.length){el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0;">No applications yet. Add your first one below ↓</div>';return;}
+  el.innerHTML=events.map((e,i)=>{
+    const diff=e.date?(new Date(e.date)-new Date())/864e5:999;
+    const urgent=diff>=0&&diff<=3&&e.status!=='completed';
+    const bc=e.status==='completed'?'b-green':urgent?'b-red':e.status==='applied'?'b-blue':'b-amber';
+    const emoji=e.status==='completed'?'✅':urgent?'🚨':e.status==='applied'?'🔵':'🟡';
+    return`<div class="ev-row">
+      <div class="ev-top"><div class="ev-name">${e.name}</div><span class="badge ${bc}">${emoji} ${e.status}</span></div>
+      <div class="ev-meta">${e.org?e.org+' · ':''}${e.date?'Due: '+e.date:''}</div>
+      ${e.task?`<div class="ev-task">⚡ ${e.task}</div>`:''}
+      <div class="ev-actions">
+        <select class="sel" onchange="changeStatus(${i},this.value)">
+          <option value="">Update status...</option>
+          <option value="pending">🟡 Pending</option>
+          <option value="applied">🔵 Applied</option>
+          <option value="completed">✅ Completed</option>
+          <option value="missed">❌ Missed</option>
+        </select>
+        <button class="del-btn" onclick="delEvent(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addEvent(){
+  const n=document.getElementById('fi-name').value.trim();
+  if(!n){document.getElementById('fi-name').focus();return;}
+  events.push({name:n,org:document.getElementById('fi-org').value.trim(),date:document.getElementById('fi-date').value,task:document.getElementById('fi-task').value.trim(),status:document.getElementById('fi-status').value});
+  save();['fi-name','fi-org','fi-task'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fi-date').value='';
+  renderApps();
+  renderToday();
+  // switch to apps view to show the new item
+  goTab('apps',document.getElementById('bn-apps'));
+}
+
+function delEvent(i){events.splice(i,1);save();renderApps();renderToday();}
+function changeStatus(i,s){if(!s)return;events[i].status=s;save();renderApps();renderToday();}
+
+function renderWell(){
+  const today=new Date().toDateString();
+  document.getElementById('wlist').innerHTML=WELL.map(w=>{const done=wellDone[today+'_'+w.id];return`<div class="row" onclick="toggleWFull('${w.id}')"><div class="chk ${done?'done':''}"><svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="remo">${w.e}</span><span class="rtxt ${done?'done':''}">${w.name}</span></div>`}).join('');
+  const days=['M','T','W','T','F','S','S'];
+  const todayIdx=(new Date().getDay()+6)%7;
+  document.getElementById('srow').innerHTML=days.map((d,i)=>`<div class="dday ${streak[i]?'done':''} ${i===todayIdx?'today':''}" onclick="toggleDay(${i})">${d}</div>`).join('');
+  document.getElementById('slabel').textContent=streak.filter(Boolean).length+' day streak 🔥';
+}
+
+function toggleW(id){const k=new Date().toDateString()+'_'+id;wellDone[k]=!wellDone[k];save();renderToday();}
+function toggleWFull(id){const k=new Date().toDateString()+'_'+id;wellDone[k]=!wellDone[k];save();renderWell();renderToday();}
+function toggleDay(i){streak[i]=!streak[i];save();renderWell();}
+
+function renderDSA(){
+  document.getElementById('dsalist').innerHTML=DSA.map(t=>{
+    const done=t.tasks.filter((_,i)=>dsaDone[t.id+'_'+i]).length;
+    const pct=Math.round(done/t.tasks.length*100);
+    return`<div class="dsa-topic">
+      <div class="dsa-head"><div class="dsa-name">${t.t}</div><span class="badge b-blue" style="font-size:10px;">${t.w} · ${done}/${t.tasks.length}</span></div>
+      <div class="prog"><div class="prog-bar" style="width:${pct}%"></div></div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:10px;">${t.tasks.map((task,i)=>{const chk=dsaDone[t.id+'_'+i];return`<div class="row" onclick="toggleDSA('${t.id}',${i})" style="padding:6px 0;"><div class="chk ${chk?'done':''}"><svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="rtxt ${chk?'done':''}" style="font-size:13px;">${task}</span></div>`}).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDSA(tid,i){const k=tid+'_'+i;dsaDone[k]=!dsaDone[k];save();renderDSA();}
+
+function renderSched(){
+  const r=(items,id)=>document.getElementById(id).innerHTML=items.map(b=>`<div class="srow"><div class="stime">${b.t}</div><div class="sdot"></div><div class="sinfo"><div class="stitle">${b.n}</div><div class="ssub">${b.s}</div></div></div>`).join('');
+  r(SCHED.m,'sm');r(SCHED.d,'sd');r(SCHED.e,'se');
+}
+
+function nextTip(){tipIdx++;document.getElementById('daily-tip').textContent=TIPS[tipIdx%TIPS.length];}
+
+// ── NOTIFICATIONS ──
+let swReg=null;
+async function enableNotifs(){
+  if(!('Notification' in window)){alert('Notifications not supported. Use Chrome on Android or Safari on iPhone.');return;}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){
+    document.getElementById('npill').classList.add('on');
+    document.getElementById('nlabel').textContent='Alerts on ✓';
+    const card=document.getElementById('notif-setup-card');
+    if(card)card.innerHTML='<div style="font-size:15px;font-weight:600;color:#86efac;margin-bottom:8px;">✅ Notifications enabled!</div><div style="font-size:13px;color:#4ade80;line-height:1.8;">You will get alerts at<br><b>7:00 AM · 12:00 PM · 8:00 PM</b><br>every day automatically.</div>';
+    startLocalTimers();
+    if(swReg&&swReg.active) swReg.active.postMessage({type:'START_NOTIFS'});
+  } else {
+    alert('Notifications were blocked.\n\nTo fix:\nAndroid Chrome: tap ⋮ → Site settings → Notifications → Allow\niPhone Safari: Settings app → Safari → Notifications → Allow');
+  }
+}
+
+function startLocalTimers(){
+  const slots=[{h:7,m:0,title:'🌅 Good morning, Yogitha!',body:"Tick your morning routine → check today's urgent tasks → 1 DSA problem."},{h:12,m:0,title:'📨 Midday check-in',body:'Check emails → update application status → any new hackathons?'},{h:20,m:0,title:'🌙 Evening review',body:"Plan tomorrow's 3 priorities → tick DSA done → wind down by 9pm."}];
+  slots.forEach(s=>{
+    function fire(){
+      if(Notification.permission==='granted') new Notification(s.title,{body:s.body,icon:'./icon.svg',tag:'la-'+s.h,requireInteraction:true});
+      setTimeout(fire,24*60*60*1000);
+    }
+    const now=new Date(),next=new Date();
+    next.setHours(s.h,s.m,0,0);
+    if(next<=now) next.setDate(next.getDate()+1);
+    setTimeout(fire,next-now);
+  });
+}
+
+function sendTest(){
+  if(Notification.permission!=='granted'){enableNotifs().then(()=>{if(Notification.permission==='granted')doTest();});return;}
+  doTest();
+}
+function doTest(){new Notification('🔔 Life Agent is working!',{body:'Alerts set for 7am, 12pm & 8pm every day. You are all set!',requireInteraction:true});}
+
+// ── INSTALL PWA ──
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredInstall=e;
+  document.getElementById('install-btn').style.display='block';
+});
+function installApp(){
+  if(deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.then(r=>{if(r.outcome==='accepted')document.getElementById('install-btn').style.display='none';deferredInstall=null;});}
+  else alert('To install:\nAndroid Chrome: tap ⋮ → Add to Home screen\niPhone Safari: tap Share → Add to Home Screen');
+}
+
+// ── INIT ──
+async function init(){
+  load();
+  const now=new Date();
+  document.getElementById('topdate').textContent=now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  renderToday();renderSched();
+
+  if('serviceWorker' in navigator){
+    try{swReg=await navigator.serviceWorker.register('./sw.js');console.log('SW ready');}catch(e){console.log('SW failed',e);}
+  }
+  if(Notification.permission==='granted'){
+    document.getElementById('npill').classList.add('on');
+    document.getElementById('nlabel').textContent='Alerts on ✓';
+    startLocalTimers();
+  }
+}
+init();
+</script>
+</body>
+</html>
